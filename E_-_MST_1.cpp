@@ -35,86 +35,59 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define dbg(x...)
 #endif
 
-int n,m,q;
+
 vector<vector<int>>edges;
 vector<int>id, sz;
 
 int root(int x){
     if(x == id[x])return x;
-    id[x] = root(id[x]);
-    return id[x];
+    return id[x] = root(id[x]);
 }
 
-bool merge(int u, int v){
+void merge(int u, int v){
     u = root(u);
     v = root(v);
-    if(u == v)return 0;
+    if(u == v)return;
     if(sz[v] > sz[u])swap(u,v);
-    id[v] = u;
     sz[u]+=sz[v];
-    return 1;
+    id[v] = u;
+}
+
+bool unconnected(int u, int v){
+    return root(u)!=root(v);
 }
 
 void solve()
 {
     int n,m,q;
     cin >> n >> m >> q;
+    
     id.resize(n+1);
-    sz.resize(n+1, 1);
-    for(int i = 1;i<=n;++i){
-        id[i] = i;
-    }
+    sz.resize(n+1,1);
+    for(int i = 1;i<=n;++i)id[i] = i;
     for(int i = 0;i<m;++i){
         int u,v,w;
         cin >> u >> v >> w;
-        edges.pb({w, u, v});
-    }    
-    sort(all(edges));
-    vector<set<pair<int,int>>>mst(n+1); // edges of the mst formed
-    // cost of edge between {u,v}
-    map<pair<int,int>, int>cost;
-    for(auto x : edges){
-        if(merge(x[1], x[2])){
-            mst[x[1]].insert({x[2], x[0]});
-            mst[x[2]].insert({x[1], x[0]});
-            cost[{x[1], x[2]}] = x[0];
-            cost[{x[2], x[1]}] = x[0];
-        }
+        edges.pb({u, v, w, -1});
     }
-    vector<int>indegree(n+1); // indegree based on mst graph
-    for(int i = 1;i<=n;++i){
-        for(auto x : mst[i]){
-            indegree[x.first]++;
-        }
-    }
-    int mx = -1;
-    vector<int>maxes(n+1);
-    for(int i = 1;i<=n;++i){
-        int curr = 0;
-        for(auto x : mst[i]){
-            curr = max(curr, x.second);
-        }
-        maxes[i] = curr;
-        if(indegree[i] == 1)continue;
-        for(auto x : mst[i]){
-            if(indegree[x.first] > 1)mx = max(mx, x.second);
-        }
-    }
-    while(q--){
+    for(int i = 0;i<q;++i){
         int u,v,w;
-        cin >> u >> v >> w;
-        if(cost.count({u, v})){
-            if(w < cost[{u, v}]){
-                cout << "Yes" << endl;
-            }else cout << "No" << endl;
+        cin>> u >> v >> w;
+        edges.pb({u, v, w, i});
+    }
+    sort(all(edges), [&](auto one, auto two){
+        return one[2] < two[2];
+    });
+    vector<string>res(q, "No");
+    for(auto x : edges){
+        if(x[3]!=-1){
+            if(unconnected(x[0], x[1]))res[x[3]] = "Yes";
             continue;
         }
-        int curr = mx;
-        if(indegree[u] == 1)curr = max(curr, maxes[u]);
-        if(indegree[v] == 1)curr = max(curr, maxes[v]);
-        if(w < curr)cout << "Yes" << endl;
-        else cout << "No" << endl;
+        merge(x[0], x[1]);
     }
+    for(auto x : res)cout << x << endl;
+
 }   
 
 int32_t main()
