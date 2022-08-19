@@ -40,8 +40,9 @@ void solve()
 {
     string s;
     cin >> s;
-    string t(4-s.size(), '0');
-    cout << t+s << endl;
+    string res;
+    for(int i = 0;i<4-s.size();++i)res+='0';
+    cout << res << s;
 }   
 
 int32_t main()

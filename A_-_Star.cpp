@@ -38,8 +38,9 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n;cin >> n;
-    cout << (100-(n%100)) << endl;
+    int n;
+    cin >> n;
+    cout << 100-(n%100) << endl;
 }   
 
 int32_t main()
