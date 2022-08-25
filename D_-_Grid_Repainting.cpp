@@ -38,21 +38,45 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
-    vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
-    for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+    int n,m;
+    cin >> n >> m;
+    vector<vector<bool>>a(n, vector<bool>(m));
+    int white = 0;
+    for(int i = 0;i<n;++i){
+        string s;
+        cin >> s;
+        for(int j = 0;j<m;++j){
+            if(s[j] == '.')a[i][j] = 1;
+            white+=a[i][j];
+        }
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
+    vector<vector<int>>dist(n, vector<int>(m, 1e18));
+    if(a[0][0])dist[0][0] = 1;
+    vector<vector<bool>>visited(n, vector<bool>(m));
+    queue<pair<int,int>>q;
+    q.push({0, 0});
+    while(!q.empty()){
+        int i = q.front().first, j = q.front().second;
+        q.pop();
+        vector<pair<int,int>>neighbours;
+        
+        if(!a[i][j] || visited[i][j])continue;
+        visited[i][j] = 1;
+
+        if(i > 0)neighbours.pb({i-1, j});
+        if(i < n-1)neighbours.pb({i+1, j});
+        if(j > 0)neighbours.pb({i, j-1});
+        if(j < m-1)neighbours.pb({i, j+1});
+        for(auto v : neighbours){
+            if(a[v.first][v.second]) dist[v.first][v.second] = min(dist[v.first][v.second], dist[i][j]+1);
+
+            if(visited[v.first][v.second])continue;
+            q.push(v);
+        }
+    }
+    // dbg(dist);
+    int res = white - dist[n-1][m-1];
+    if(res < 0)res = -1;
     cout << res;
 }   
 

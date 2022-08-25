@@ -38,22 +38,46 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
-    vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
+    int n,m;
+    cin >>n >> m;
+    vector<vector<char>>a(n+1, vector<char>(m+1));
     for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+        string s;
+        cin >> s;
+        for(int j = 1;j<=m;++j)a[i][j] = s[j-1];
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
-    cout << res;
+    int x = 1, y = 1;
+    vector<vector<bool>>visited(n+1, vector<bool>(m+1));
+    visited[1][1] =1;
+    while(1){
+        
+        if(a[x][y]== 'R'){
+            if(y == m){
+                break;
+            }
+            
+            y++;
+        }else if(a[x][y] == 'L'){
+            if(y == 1)break;
+            
+            y--;
+        }else if(a[x][y] == 'U'){
+            if(x == 1)break;
+            
+            x--;
+        }else{
+            if(x == n)break;
+            
+            x++;
+        }
+        
+        if(visited[x][y]){
+            cout << -1 << endl;
+            return;
+        }
+        visited[x][y] =1;
+    }
+    cout << x <<' ' << y << endl;
 }   
 
 int32_t main()

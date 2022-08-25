@@ -38,21 +38,30 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
+    int n;
+    cin >> n;
     vector<int>a(n+1);
     for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
+    set<vector<int>>edges;
+    vector<set<vector<int>>>adj(n+1),adj2(n+1); // all directed edges going to i
     for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+        for(int j = 1;j<=n;++j){
+            if(i == j)continue;
+            int cost = (a[i]*abs(i-j));
+            edges.insert({-cost, i, j});
+            adj[j].insert({-cost, i,j});
+            adj2[i].insert({-cost, i, j});
+        }
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
+    set<vector<int>>removed;
+    int res = 0;
+    for(auto x : edges){
+        if(removed.count(x))continue;
+        removed.insert(x);
+        res+=(abs(x[0]));
+        for(auto y : adj[x[2]])removed.insert(y);
+        for(auto y : adj2[x[1]])removed.insert(y);
+    }
     cout << res;
 }   
 

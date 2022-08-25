@@ -35,25 +35,31 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 #define dbg(x...)
 #endif
 
-
+int p = 998244353;
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
-    vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
-    for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+    int h,w,K;
+    cin >> h>> w >> K;
+    int x1, y1, x2, y2;
+    cin >> x1 >> y1 >> x2 >>y2;
+    vector<vector<int>>dp(K+1, vector<int>(4)); 
+    /*
+    dp[k][0] number of ways to reach x1,y1 in k moves
+    dp[k][1] number of ways to reach a cell in the same row as x1,y1 in k moves
+    dp[k][2] number of ways to reacha cell in the same column as x1,y1 in k moves
+    dp[k][3] number of ways to reach any other cell other than those specified in 0,1,2 in k moves
+    */
+    dp[0][0] = 1;
+    for(int k = 1;k<=K;++k){
+        dp[k][0] = ((((dp[k-1][1]%p)*(w-1))%p) + (((dp[k-1][2]%p) * (h-1))%p))%p;
+        dp[k][1] = ((dp[k-1][0]%p) + (((dp[k-1][1]%p) * (w-2))%p) + (((dp[k-1][3]%p)* (h-1))%p))%p;
+        dp[k][2] = ((dp[k-1][0]%p) + (((dp[k-1][2]%p) * (h-2))%p) + ((dp[k-1][3]%p)*(w-1))%p)%p;
+        dp[k][3] = ((dp[k-1][1]%p)+(((dp[k-1][3]%p)*(h-2))%p)+(dp[k-1][2]%p)+(((dp[k-1][3]%p)*(w-2))%p))%p;
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
-    cout << res;
+    if(x1==x2 && y1==y2)cout << dp[K][0] << endl;
+    else if(x1 == x2)cout << dp[K][1] << endl;
+    else if(y1 == y2) cout << dp[K][2] << endl;
+    else cout << dp[K][3] << endl;
 }   
 
 int32_t main()
@@ -72,7 +78,6 @@ int32_t main()
     // cin >> T;
     for(int i = 1;i<=T;++i)
     {
-        // cout << "Case #" << i << ": ";
         solve();
     }
 }

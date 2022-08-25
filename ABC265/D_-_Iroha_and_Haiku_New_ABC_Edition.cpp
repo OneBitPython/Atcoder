@@ -38,22 +38,23 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
-    vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
+    int n,p,q,r;
+    cin >> n >> p >> q >> r;
+    vector<int>a(n);
+    for(int &u : a)cin >> u;
+    vector<int>pref(n+1);
     for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+        pref[i] = pref[i-1]+a[i-1];
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
-    cout << res;
+    // dbg(idx);
+    for(int i = 0;i<=n;++i){
+        // dbg(pref[i], pref[i]+p, pref[i]+p+q,pref[i]+p+q+r);
+        if(binary_search(all(pref),pref[i]+p) && binary_search(all(pref), pref[i]+p+q) && binary_search(all(pref),pref[i]+p+q+r)){
+            cout << "Yes" << endl;
+            return;
+        }
+    }
+    cout << "No";
 }   
 
 int32_t main()

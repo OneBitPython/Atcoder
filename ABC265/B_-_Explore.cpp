@@ -38,22 +38,27 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
-    vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
-    for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+    int n,m,t;
+    cin >> n >>m >> t;
+    map<int,int>c;
+    vector<int>a(n);
+    for(int i = 0;i<n-1;++i)cin >> a[i];
+    for(int i = 0;i<m;++i){
+        int u,v;
+        cin >> u >> v;
+        c[u] += v;
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
-    cout << res;
+    int room = 1;
+    for(int i = 0;i<n-1;++i){
+        t-=a[i];
+        if(t <= 0){
+            cout << "No" << endl;
+            return;
+        }
+        room++;
+        t += c[room];
+    }
+    cout << "Yes";
 }   
 
 int32_t main()

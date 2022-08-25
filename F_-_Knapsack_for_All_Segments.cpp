@@ -38,21 +38,28 @@ void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v..
 
 void solve()
 {
-    int n,l,r;
-    cin >> n >> l >> r;
+    int n,s;
+    cin >> n >> s;
     vector<int>a(n+1);
-    for(int i =1;i<=n;++i)cin >> a[i];
-    vector<int>dp1(n+1,1e18), dp2(n+2,1e18);
-    dp1[0] = 0;
-    dp2[n+1] = 0;
+    for(int i = 1;i<=n;++i)cin >> a[i];
+    int res = 0;
+    int mod = 998244353;
     for(int i = 1;i<=n;++i){
-        dp1[i] = min(dp1[i-1]+a[i], i*l);
+        vector<vector<int>>dp(n+1, vector<int>(s+1));
+        dp[i-1][0] = 1;
+        for(int j = i;j<=n;++j){
+            dp[j][0] = 1;
+            for(int k = 1;k<=s;++k){
+                dp[j][k] = dp[j-1][k];
+                if(k >= a[j]){
+                    dp[j][k] = ((dp[j][k]%mod)+(dp[j-1][k-a[j]]%mod))%mod;
+                }
+            }
+            
+            res = ((res%mod)+(dp[j][s]%mod))%mod;
+        }
+        // dbg(dp, i);
     }
-    for(int i = n;i>=1;--i)dp2[i] = min(dp2[i+1]+a[i], (n-i+1)*r);
-    int res = accumulate(all(a), 0LL);
-    for(int i = 1;i<n;++i)res = min(res, dp1[i] + dp2[i+1]);
-    res  = min(res, dp1[n]);
-    res = min(res, dp2[1]);
     cout << res;
 }   
 
@@ -72,7 +79,6 @@ int32_t main()
     // cin >> T;
     for(int i = 1;i<=T;++i)
     {
-        // cout << "Case #" << i << ": ";
         solve();
     }
 }
